@@ -1,150 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>FRC Scouting</title>
-  <style>
-    body{background:#121212;color:white;font-family:Arial;text-align:center;padding:10px}
-    .counter-btn,.toggle-btn{padding:10px;margin:4px;border:none;border-radius:6px}
-    .counter-btn{background:#5c0000;color:white}
-    .toggle-btn{background:#333;color:white}
-    input,textarea{background:#222;color:white;border:none;border-radius:5px;padding:8px;width:80%}
-    #reader{margin:auto;width:300px}
-    table{margin:auto;border-collapse:collapse;width:95%;margin-top:20px}
-    td,th{border:1px solid #555;padding:6px;font-size:14px}
-  </style>
-  <script src="https://unpkg.com/html5-qrcode"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FRC Scouting</title>
+<style>
+body{background:#121212;color:white;font-family:Arial;padding:10px;text-align:center}
+input,textarea,select{width:80%;padding:8px;margin:5px;border-radius:5px;background:#222;color:white;border:none}
+button{padding:8px 12px;margin:4px;border-radius:6px;border:none;cursor:pointer}
+.counter-btn{background:#5c0000;color:white}
+.toggle-btn{background:#333;color:white}
+table{border-collapse:collapse;margin:auto;width:95%;margin-top:20px}
+td,th{border:1px solid #555;padding:6px;font-size:14px}
+</style>
+<script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-  <h2>FRC Scouting Interface</h2>
+<h2>FRC Scouting Interface</h2>
 
-  <div id="login">
-    <p>Enter FML### code or scan QR:</p>
-    <input id="userCode" maxlength="6" placeholder="e.g. JDS123">
-    <button onclick="login()">Login</button>
-    <div id="reader"></div>
-    <p id="message"></p>
-  </div>
+<div id="login">
+  <p>Enter FML### code or scan QR:</p>
+  <input id="userCode" maxlength="6" placeholder="e.g. JDS123">
+  <button onclick="login()">Login</button>
+  <div id="reader"></div>
+  <p id="message"></p>
+</div>
 
-  <div id="scoutSection" style="display:none;">
-    <h3 id="matchHeader">Match Info Loading...</h3>
-    <p id="teamInfo"></p>
-    <hr>
+<div id="scoutSection" style="display:none;">
+  <h3 id="matchHeader">Match Info Loading...</h3>
+  <p id="teamInfo"></p>
+  <hr>
 
-    <!-- 2024 Crescendo Scoring Section -->
-    <h4>Auto Period</h4>
-    <button class="counter-btn" onclick="adjust('autoSpeaker',1)">+ Speaker</button>
-    <button class="counter-btn" onclick="adjust('autoSpeaker',-1)">- Speaker</button>
-    <p>Auto Speaker: <span id="autoSpeaker">0</span></p>
+  <!-- Auto Period -->
+  <h4>Auto</h4>
+  <button class="counter-btn" onclick="adjust('autoSpeaker',1)">+ Speaker</button>
+  <button class="counter-btn" onclick="adjust('autoSpeaker',-1)">- Speaker</button>
+  <span id="autoSpeaker">0</span><br>
+  <button class="counter-btn" onclick="adjust('autoAmp',1)">+ Amp</button>
+  <button class="counter-btn" onclick="adjust('autoAmp',-1)">- Amp</button>
+  <span id="autoAmp">0</span><br>
 
-    <button class="counter-btn" onclick="adjust('autoAmp',1)">+ Amp</button>
-    <button class="counter-btn" onclick="adjust('autoAmp',-1)">- Amp</button>
-    <p>Auto Amp: <span id="autoAmp">0</span></p>
+  <!-- Teleop -->
+  <h4>Teleop</h4>
+  <button class="counter-btn" onclick="adjust('teleSpeaker',1)">+ Speaker</button>
+  <button class="counter-btn" onclick="adjust('teleSpeaker',-1)">- Speaker</button>
+  <span id="teleSpeaker">0</span><br>
+  <button class="counter-btn" onclick="adjust('teleAmp',1)">+ Amp</button>
+  <button class="counter-btn" onclick="adjust('teleAmp',-1)">- Amp</button>
+  <span id="teleAmp">0</span><br>
 
-    <h4>Teleop Period</h4>
-    <button class="counter-btn" onclick="adjust('teleSpeaker',1)">+ Speaker</button>
-    <button class="counter-btn" onclick="adjust('teleSpeaker',-1)">- Speaker</button>
-    <p>Tele Speaker: <span id="teleSpeaker">0</span></p>
+  <!-- Endgame -->
+  <h4>Endgame</h4>
+  <button class="toggle-btn" onclick="toggle('climb')">Climbed: <span id="climb">No</span></button>
+  <button class="toggle-btn" onclick="toggle('trap')">Trapped: <span id="trap">No</span></button>
 
-    <button class="counter-btn" onclick="adjust('teleAmp',1)">+ Amp</button>
-    <button class="counter-btn" onclick="adjust('teleAmp',-1)">- Amp</button>
-    <p>Tele Amp: <span id="teleAmp">0</span></p>
+  <!-- Robot Info -->
+  <h4>Robot Info</h4>
+  <button class="toggle-btn" onclick="toggle('defense')">Defense Bot: <span id="defense">No</span></button>
+  <button class="toggle-btn" onclick="toggle('topHeavy')">Top Heavy: <span id="topHeavy">No</span></button>
+  <button class="toggle-btn" onclick="toggle('broke')">Broke: <span id="broke">No</span></button>
 
-    <h4>Endgame</h4>
-    <button class="toggle-btn" onclick="toggle('climb')">Climbed: <span id="climb">No</span></button>
-    <button class="toggle-btn" onclick="toggle('trap')">Trapped: <span id="trap">No</span></button>
+  <textarea id="notes" placeholder="Notes..."></textarea><br>
+  <button onclick="submitData()">Submit</button>
+</div>
 
-    <h4>Robot Info</h4>
-    <button class="toggle-btn" onclick="toggle('defense')">Defense Bot: <span id="defense">No</span></button>
-    <button class="toggle-btn" onclick="toggle('topHeavy')">Top Heavy: <span id="topHeavy">No</span></button>
-    <button class="toggle-btn" onclick="toggle('broke')">Broke: <span id="broke">No</span></button>
+<div id="adminSection" style="display:none;">
+<h3>Admin Panel</h3>
+<select id="populateSelect"></select>
+<button onclick="populateChart()">Populate Chart</button>
+<table id="assignTable">
+<tr><th>Position</th><th>Scout</th><th>Matches Left</th><th>Actions</th></tr>
+</table>
+<h4>Alerts</h4>
+<table id="alertTable">
+<tr><th>Time</th><th>User</th><th>Type</th></tr>
+</table>
+</div>
 
-    <textarea id="notes" placeholder="Notes..."></textarea><br>
-    <button onclick="submitData()">Submit</button>
-  </div>
+<script>
+const adminCodes=["ADM001","ADM002","ADM003"];
+const sheetUrl=localStorage.getItem("sheetUrl");
+const tbaKey=localStorage.getItem("tbaKey");
+const eventCode=localStorage.getItem("eventCode");
+let userCode, matchData;
+const scores={autoSpeaker:0,autoAmp:0,teleSpeaker:0,teleAmp:0,climb:false,trap:false,defense:false,topHeavy:false,broke:false};
 
-  <div id="adminSection" style="display:none;">
-    <hr><h3>Admin Panel</h3>
-    <table id="assignTable">
-      <tr><th>Position</th><th>Scout</th><th>Matches Left</th><th>Actions</th></tr>
-    </table>
-    <h4>Alerts</h4>
-    <table id="alertTable">
-      <tr><th>Time</th><th>User</th><th>Type</th></tr>
-    </table>
-  </div>
+function adjust(id,val){scores[id]+=val;if(scores[id]<0)scores[id]=0;document.getElementById(id).textContent=scores[id];}
+function toggle(id){scores[id]=!scores[id];document.getElementById(id).textContent=scores[id]?"Yes":"No";}
 
-  <script>
-    const adminCodes=["CMW123","ADM002","ADM003"]; // 🧭 Editable admin list
-    const sheetUrl=localStorage.getItem("sheetUrl");
-    const tbaKey=localStorage.getItem("tbaKey");
-    const eventCode=localStorage.getItem("eventCode");
-    let userCode,matchData;
-    const scores={autoSpeaker:0,autoAmp:0,teleSpeaker:0,teleAmp:0,climb:false,trap:false,defense:false,topHeavy:false,broke:false};
+async function login(){
+  userCode=document.getElementById("userCode").value.toUpperCase();
+  if(!/^[A-Z]{3}\d{3}$/.test(userCode))return alert("Invalid code format.");
+  document.getElementById("login").style.display="none";
+  document.getElementById("scoutSection").style.display="block";
+  if(adminCodes.includes(userCode)){
+    document.getElementById("adminSection").style.display="block";
+    setInterval(fetchAssignments,10000);
+    setInterval(fetchAlerts,10000);
+  }
+  await getMatchData();
+  await autoAssign();
+}
 
-    function adjust(id,val){scores[id]+=val;if(scores[id]<0)scores[id]=0;document.getElementById(id).textContent=scores[id];}
-    function toggle(id){scores[id]=!scores[id];document.getElementById(id).textContent=scores[id]?"Yes":"No";}
+async function getMatchData(){
+  try{
+    const res=await fetch(`https://www.thebluealliance.com/api/v3/event/${eventCode}/matches/simple`,{headers:{"X-TBA-Auth-Key":tbaKey}});
+    const data=await res.json();
+    matchData=data[0];
+    document.getElementById("matchHeader").textContent=`Match: ${matchData.key}`;
+    // Highlight robot for user
+    const assignedRobot="frc343"; // fetch from population or assignment sheet
+    const robotFormatted=assignedRobot.replace(/frc/i,"FRC ");
+    document.getElementById("teamInfo").textContent=`Your Robot: ${robotFormatted}`;
+  }catch(err){document.getElementById("teamInfo").textContent="Error loading match info.";}
+}
 
-    async function login(){
-      userCode=document.getElementById("userCode").value.toUpperCase();
-      if(!/^[A-Z]{3}\d{3}$/.test(userCode))return alert("Invalid code format.");
-      document.getElementById("login").style.display="none";
-      document.getElementById("scoutSection").style.display="block";
-      if(adminCodes.includes(userCode)){
-        document.getElementById("adminSection").style.display="block";
-        setInterval(fetchAssignments,10000);
-        setInterval(fetchAlerts,10000);
-      }
-      await getMatchData();
-      await autoAssign();
-    }
+async function submitData(){
+  const payload={userCode,eventCode,match:matchData.key,robot:document.getElementById("teamInfo").textContent.split(":")[1].trim(),scores,notes:document.getElementById("notes").value};
+  await fetch(sheetUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  alert("Submitted!"); await decrementMatchCount(userCode);
+}
 
-    async function getMatchData(){
-      try{
-        const res=await fetch(`https://www.thebluealliance.com/api/v3/event/${eventCode}/matches/simple`,{headers:{"X-TBA-Auth-Key":tbaKey}});
-        const data=await res.json();
-        matchData=data[0];
-        document.getElementById("matchHeader").textContent=`Match: ${matchData.key}`;
-        document.getElementById("teamInfo").textContent=`Red: ${matchData.alliances.red.team_keys.join(", ")} | Blue: ${matchData.alliances.blue.team_keys.join(", ")}`;
-      }catch(err){document.getElementById("teamInfo").textContent="Error loading match info.";}
-    }
+// Admin functions
+async function fetchAssignments(){
+  const res=await fetch(sheetUrl+"?action=getAssignments");
+  const data=await res.json();
+  const table=document.getElementById("assignTable");
+  table.innerHTML="<tr><th>Position</th><th>Scout</th><th>Matches Left</th><th>Actions</th></tr>";
+  for(const row of data){
+    table.innerHTML+=`<tr><td>${row.pos}</td><td>${row.scout}</td><td>${row.left}</td><td><button onclick="overrideAssign('${row.pos}')">Override</button></td></tr>`;
+  }
+}
+async function overrideAssign(pos){
+  const newScout=prompt("Enter new scout code for "+pos+":");
+  if(newScout) await fetch(sheetUrl+"?action=override&pos="+pos+"&user="+newScout,{mode:"no-cors"});
+  fetchAssignments();
+}
+async function fetchAlerts(){
+  const res=await fetch(sheetUrl+"?action=getAlerts");
+  const data=await res.json();
+  const table=document.getElementById("alertTable");
+  table.innerHTML="<tr><th>Time</th><th>User</th><th>Type</th></tr>";
+  for(const row of data)table.innerHTML+=`<tr><td>${row.time}</td><td>${row.user}</td><td>${row.type}</td></tr>`;
+}
+async function populateChart(){
+  const match=prompt("Enter Match Key:");
+  const table=document.getElementById("assignTable");
+  table.innerHTML="<tr><th>Position</th><th>Scout</th><th>Matches Left</th><th>Actions</th></tr>";
+  const res=await fetch(sheetUrl+"?action=getPopulation&match="+match);
+  const data=await res.json();
+  for(const row of data)table.innerHTML+=`<tr><td>${row.pos}</td><td>${row.scout}</td><td>${row.left}</td><td><button onclick="overrideAssign('${row.pos}')">Override</button></td></tr>`;
+}
 
-    async function submitData(){
-      const payload={userCode,eventCode,match:matchData.key,scores,notes:document.getElementById("notes").value};
-      await fetch(sheetUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-      alert("Submitted!"); await decrementMatchCount(userCode);
-    }
-
-    async function autoAssign(){
-      await fetch(sheetUrl+"?action=autoAssign&user="+userCode,{mode:"no-cors"});
-    }
-
-    async function decrementMatchCount(user){
-      await fetch(sheetUrl+"?action=decrement&user="+user,{mode:"no-cors"});
-    }
-
-    async function fetchAssignments(){
-      const res=await fetch(sheetUrl+"?action=getAssignments");
-      const data=await res.json();
-      const table=document.getElementById("assignTable");
-      table.innerHTML="<tr><th>Position</th><th>Scout</th><th>Matches Left</th><th>Actions</th></tr>";
-      for(const row of data) table.innerHTML+=`<tr><td>${row.pos}</td><td>${row.scout}</td><td>${row.left}</td><td><button onclick="overrideAssign('${row.pos}')">Override</button></td></tr>`;
-    }
-
-    async function overrideAssign(pos){
-      const newScout=prompt("Enter new scout code for "+pos+":");
-      if(newScout) await fetch(sheetUrl+"?action=override&pos="+pos+"&user="+newScout,{mode:"no-cors"});
-      fetchAssignments();
-    }
-
-    async function fetchAlerts(){
-      const res=await fetch(sheetUrl+"?action=getAlerts");
-      const data=await res.json();
-      const table=document.getElementById("alertTable");
-      table.innerHTML="<tr><th>Time</th><th>User</th><th>Type</th></tr>";
-      for(const row of data) table.innerHTML+=`<tr><td>${row.time}</td><td>${row.user}</td><td>${row.type}</td></tr>`;
-    }
-  </script>
+// Placeholder functions for Apps Script calls
+async function autoAssign(){ await fetch(sheetUrl+"?action=autoAssign&user="+userCode,{mode:"no-cors"});}
+async function decrementMatchCount(user){await fetch(sheetUrl+"?action=decrement&user="+user,{mode:"no-cors"});}
+</script>
 </body>
 </html>
