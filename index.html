@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>FRC Scouting Setup</title>
+  <style>
+    body{background:#121212;color:#fff;font-family:Arial;text-align:center;padding:40px}
+    input,button{padding:10px;margin:10px;border:none;border-radius:5px}
+    input{width:80%;background:#333;color:white}
+    button{background:#5c0000;color:white;cursor:pointer}
+  </style>
+</head>
+<body>
+  <h2>FRC Scouting Setup</h2>
+  <p>Enter your TBA API Key and Event Code (default: 2024onwin)</p>
+  <input id="apiKey" placeholder="TBA API Key (placeholder for now)">
+  <input id="eventCode" placeholder="Event Code (e.g. 2024onwin)">
+  <input id="sheetUrl" placeholder="Google Apps Script Web App URL">
+  <button onclick="saveSettings()">Connect & Continue</button>
+  <p id="message"></p>
+  <script>
+    function saveSettings(){
+      const apiKey=document.getElementById("apiKey").value||"PLACEHOLDER_TBA_KEY";
+      const eventCode=document.getElementById("eventCode").value||"2024onwin";
+      const sheetUrl=document.getElementById("sheetUrl").value;
+      if(!sheetUrl)return document.getElementById("message").textContent="Enter your Apps Script Web App URL.";
+      localStorage.setItem("tbaKey",apiKey);
+      localStorage.setItem("eventCode",eventCode);
+      localStorage.setItem("sheetUrl",sheetUrl);
+      window.location.href="scout.html";
+    }
+  </script>
+</body>
+</html>
